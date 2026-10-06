@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Placepro - Company Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <main class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="/admin/companies" class="btn btn-outline-secondary btn-sm rounded-pill mb-2"><i class="bi bi-arrow-left"></i> Back to Companies</a>
+                    <h2 class="fw-bold mb-1" th:text="${company.name}">Company Name</h2>
+                    <span class="badge bg-info text-dark fs-6" th:text="${company.industry}">Industry</span>
+                </div>
+                <div>
+                    <a th:href="@{'/admin/companies/' + ${company.id} + '/edit'}" class="btn btn-outline-primary rounded-pill">
+                        <i class="bi bi-pencil me-1"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-header bg-white fw-bold py-3 border-0">
+                            <i class="bi bi-building text-primary me-2"></i> Company & Role Overview
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush mb-3">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="text-muted">Location</span>
+                                    <span class="fw-semibold" th:text="${company.location}">Location</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="text-muted">Package Offered</span>
+                                    <span class="fw-bold text-success" th:text="${company.packageOffered}">7.0 - 12.5 LPA</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <span class="text-muted">Minimum CGPA Required</span>
+                                    <span class="badge bg-primary fs-6" th:text="${company.minimumCgpa}">7.0</span>
+                                </li>
+                            </ul>
+                            <div>
+                                <label class="text-muted small fw-bold d-block mb-1">Company Description</label>
+                                <p class="text-secondary mb-0" th:text="${company.description}">Description...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-header bg-white fw-bold py-3 border-0">
+                            <i class="bi bi-tools text-warning me-2"></i> Skill Requirements
+                        </div>
+                        <div class="card-body">
+                            <label class="text-muted small fw-bold d-block mb-2">Required Technical Skills</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span th:each="skill : ${#strings.arraySplit(company.requiredSkills, ',')}"
+                                      class="badge bg-light text-dark border p-2 fs-6" th:text="${#strings.trim(skill)}">Java</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

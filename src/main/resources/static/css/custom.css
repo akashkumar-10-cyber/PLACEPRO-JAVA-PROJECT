@@ -1,0 +1,194 @@
+:root {
+    --primary-color: #1b3b6f;
+    --primary-dark: #065a82;
+    --accent-color: #2563eb;
+    --bg-light: #f4f6f9;
+    --sidebar-width: 280px;
+}
+
+/* Hardware Accelerated Smooth Background */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #edf2f7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #0f172a;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #edf2f7 url('/images/app-bg.jpg') no-repeat center center;
+    background-size: cover;
+    z-index: -1;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.brand-gradient {
+    background: linear-gradient(135deg, #1b3b6f 0%, #065a82 100%);
+    color: white;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: calc(100vh - 56px);
+}
+
+/* Uncompromised Crystal-Clear Background Container */
+.main-content {
+    flex: 1;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding: 2rem 3rem;
+    background: transparent !important;
+}
+
+/* Offcanvas Pop-up Drawer Sidebar */
+.sidebar.offcanvas {
+    width: var(--sidebar-width) !important;
+    background-color: #1e293b;
+    color: #f8fafc;
+    border-right: 1px solid #334155;
+    z-index: 1055;
+}
+
+.sidebar .nav-link {
+    color: #94a3b8;
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 8px;
+    margin: 3px 0;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link i {
+    font-size: 1.2rem;
+}
+
+/* Fast GPU-Accelerated Cards */
+.card {
+    background: rgba(255, 255, 255, 0.94) !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05) !important;
+    border-radius: 16px !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    will-change: transform;
+}
+
+.card-stat-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.card-stat-link:hover .card {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.15) !important;
+    border-color: rgba(37, 99, 235, 0.4) !important;
+}
+
+.card-stat-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-stat-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ULTRA-SMOOTH 60FPS COMPOSITOR-ONLY ENTRANCE ANIMATION (ZERO LAG) */
+.animate-fade-in-up {
+    animation: smoothSlideFade 0.28s cubic-bezier(0, 0, 0.2, 1) forwards;
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.delay-header { animation-delay: 0.05s; opacity: 0; }
+.delay-1 { animation-delay: 0.10s; opacity: 0; }
+.delay-2 { animation-delay: 0.16s; opacity: 0; }
+.delay-3 { animation-delay: 0.22s; opacity: 0; }
+.delay-4 { animation-delay: 0.28s; opacity: 0; }
+.delay-5 { animation-delay: 0.34s; opacity: 0; }
+
+@keyframes smoothSlideFade {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Sharp Bold Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.3px;
+}
+
+.text-muted {
+    color: #475569 !important;
+    font-weight: 500;
+}
+
+/* Remove up/down spinner arrows from number inputs for clean typing */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Custom Table Styling */
+.table-custom th {
+    background-color: #f1f5f9;
+    color: #334155;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #cbd5e1;
+}
+
+.table-custom td {
+    vertical-align: middle;
+    border-bottom: 1px solid #e2e8f0;
+    color: #0f172a;
+    font-weight: 500;
+}

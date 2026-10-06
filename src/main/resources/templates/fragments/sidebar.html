@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<div th:fragment="sidebar" class="offcanvas offcanvas-start sidebar p-3 text-white" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+    
+    <!-- Offcanvas Pop-up Header with Title & Close Button -->
+    <div class="offcanvas-header border-bottom border-secondary pb-3 mb-3">
+        <h5 class="offcanvas-title fw-bold text-warning d-flex align-items-center gap-2" id="sidebarMenuLabel">
+            <i class="bi bi-grid-3x3-gap-fill text-warning"></i> PLACEMENT PORTAL
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+
+    <!-- ADMIN MENU -->
+    <ul class="nav nav-pills flex-column mb-auto" sec:authorize="hasAuthority('ROLE_ADMIN')">
+        <li class="nav-item">
+            <a href="/admin/dashboard" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/dashboard')} ? 'active'">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/students" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/students')} ? 'active'">
+                <i class="bi bi-people-fill"></i> Student Management
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/department-records" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/department-records')} ? 'active'">
+                <i class="bi bi-diagram-3-fill text-info"></i> Dept Placement Records
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/companies" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/companies')} ? 'active'">
+                <i class="bi bi-building"></i> Company Directory
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/placement-drives" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/placement-drives')} ? 'active'">
+                <i class="bi bi-calendar-event-fill"></i> Placement Drives
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/applications" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/applications')} ? 'active'">
+                <i class="bi bi-file-earmark-check-fill"></i> Application Tracking
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/ai-recommendations" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/admin/ai-recommendations')} ? 'active'">
+                <i class="bi bi-cpu-fill text-warning"></i> AI Recommendations
+            </a>
+        </li>
+    </ul>
+
+    <!-- STUDENT MENU -->
+    <ul class="nav nav-pills flex-column mb-auto" sec:authorize="hasAuthority('ROLE_STUDENT')">
+        <li class="nav-item">
+            <a href="/student/dashboard" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/dashboard')} ? 'active'">
+                <i class="bi bi-speedometer2"></i> Student Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/profile" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/profile')} ? 'active'">
+                <i class="bi bi-person-badge-fill"></i> My Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/available-drives" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/available-drives')} ? 'active'">
+                <i class="bi bi-rocket-takeoff-fill"></i> Available Drives
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/eligible-companies" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/eligible-companies')} ? 'active'">
+                <i class="bi bi-building-check"></i> Companies Directory
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/my-applications" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/my-applications')} ? 'active'">
+                <i class="bi bi-card-checklist"></i> My Applications
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/my-recommendations" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/my-recommendations')} ? 'active'">
+                <i class="bi bi-stars text-warning"></i> AI Company Matches
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/skill-gap" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/skill-gap')} ? 'active'">
+                <i class="bi bi-diagram-3-fill"></i> Skill Gap Analysis
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/student/readiness" class="nav-link" th:classappend="${#httpServletRequest != null and #httpServletRequest.requestURI.startsWith('/student/readiness')} ? 'active'">
+                <i class="bi bi-speedometer"></i> Placement Readiness
+            </a>
+        </li>
+    </ul>
+
+    <!-- Offcanvas Footer info -->
+    <div class="border-top border-secondary pt-3 mt-3 text-center text-muted small">
+        Placepro Placement Management Cell &copy; 2026
+    </div>
+</div>
+</html>

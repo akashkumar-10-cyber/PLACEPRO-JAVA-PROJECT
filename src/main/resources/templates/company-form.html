@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isEdit ? 'Edit Company' : 'Add Company'}">Company Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <main class="main-content">
+            <div class="mb-4">
+                <a href="/admin/companies" class="btn btn-outline-secondary btn-sm rounded-pill mb-2"><i class="bi bi-arrow-left"></i> Back to List</a>
+                <h2 class="fw-bold mb-1" th:text="${isEdit ? 'Edit Company Profile' : 'Add New Company'}">Company Form</h2>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <form th:action="${isEdit ? '/admin/companies/' + companyDto.id : '/admin/companies'}"
+                          th:object="${companyDto}" method="post">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Company Name *</label>
+                                <input type="text" th:field="*{name}" class="form-control" placeholder="e.g. Zoho Corporation" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Industry Sector *</label>
+                                <input type="text" th:field="*{industry}" class="form-control" placeholder="e.g. Software & Cloud Services" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('industry')}" th:errors="*{industry}">Error</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Job Location *</label>
+                                <input type="text" th:field="*{location}" class="form-control" placeholder="e.g. Chennai / Hybrid" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('location')}" th:errors="*{location}">Error</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Package Offered Details *</label>
+                                <input type="text" th:field="*{packageOffered}" class="form-control" placeholder="e.g. 7.0 - 12.5 LPA or 8.5 LPA" required>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('packageOffered')}" th:errors="*{packageOffered}">Error</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Minimum CGPA Criterion *</label>
+                                <input type="number" step="0.1" min="6.5" max="10.0" th:field="*{minimumCgpa}" class="form-control" placeholder="e.g. 6.5 - 10.0" required>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Required Technical Skills (Comma-separated) *</label>
+                                <textarea th:field="*{requiredSkills}" class="form-control" rows="2" placeholder="Java, Spring Boot, SQL, Git" required></textarea>
+                                <div class="text-danger small" th:if="${#fields.hasErrors('requiredSkills')}" th:errors="*{requiredSkills}">Error</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Company Description & Requirements</label>
+                                <textarea th:field="*{description}" class="form-control" rows="3" placeholder="Brief overview of company culture and job profile..."></textarea>
+                            </div>
+
+                            <div class="col-md-12 mt-4">
+                                <button type="submit" class="btn btn-primary px-4 rounded-pill fw-bold brand-gradient border-0">
+                                    <i class="bi bi-save me-1"></i> Save Company Record
+                                </button>
+                                <a href="/admin/companies" class="btn btn-outline-secondary px-4 rounded-pill ms-2">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

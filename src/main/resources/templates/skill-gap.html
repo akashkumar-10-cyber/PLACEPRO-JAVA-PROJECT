@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PlacePro - Skill Gap Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <main class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1"><i class="bi bi-diagram-3-fill text-info me-2"></i>AI Skill Gap Analysis</h2>
+                    <p class="text-muted mb-0">Identify missing skills required by target companies and get actionable learning recommendations.</p>
+                </div>
+            </div>
+
+            <!-- SELECT TARGET COMPANY -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <form th:action="@{/student/skill-gap}" method="get" class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Select Target Company for Analysis</label>
+                            <select name="companyId" class="form-select form-select-lg" required>
+                                <option th:each="c : ${companies}"
+                                        th:value="${c.id}"
+                                        th:text="${c.name + ' (' + c.industry + ' - Min CGPA: ' + c.minimumCgpa + ')'}"
+                                        th:selected="${selectedCompany != null and selectedCompany.id == c.id}">Company</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-info text-white btn-lg w-100 fw-bold shadow-sm">
+                                <i class="bi bi-search me-1"></i> Analyze Skill Gap
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SKILL GAP RESULTS -->
+            <div th:if="${analysis != null}">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-white fw-bold py-3 border-0 d-flex justify-content-between align-items-center">
+                        <span class="fs-5" th:text="${'Skill Comparison: ' + student.name + ' vs ' + selectedCompany.name}">Comparison</span>
+                        <span class="badge bg-primary fs-6" th:text="${'Match Score: ' + analysis.matchScore + '%'}">84%</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle h-100">
+                                    <h5 class="fw-bold text-success mb-3"><i class="bi bi-check-circle-fill me-2"></i> Matched Technical Skills</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span th:each="ms : ${analysis.matchedSkills}" class="badge bg-success p-2 fs-6" th:text="${ms}">Java</span>
+                                        <span th:if="${#lists.isEmpty(analysis.matchedSkills)}" class="text-muted">No overlapping skills found.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle h-100">
+                                    <h5 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i> Missing Technical Skills</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span th:each="ms : ${analysis.missingSkills}" class="badge bg-danger p-2 fs-6" th:text="${ms}">Git</span>
+                                        <span th:if="${#lists.isEmpty(analysis.missingSkills)}" class="text-success fw-bold">None! You possess all required technical skills.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-light rounded-4 border">
+                            <h5 class="fw-bold text-dark mb-2"><i class="bi bi-award-fill text-warning me-2"></i> AI Recommended Learning Roadmap</h5>
+                            <p class="lead fs-6 text-secondary mb-0" th:text="${analysis.suggestedImprovements}">Learn Spring Boot fundamentals and Git workflow.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

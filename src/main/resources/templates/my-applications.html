@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PlacePro - My Applications</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <main class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1"><i class="bi bi-card-checklist text-info me-2"></i>My Placement Applications</h2>
+                    <p class="text-muted mb-0">Track real-time selection status for your submitted applications.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover table-custom align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Job Role</th>
+                                <th>Package</th>
+                                <th>Applied Date</th>
+                                <th>Application Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="app : ${applications}">
+                                <td class="fw-bold text-dark" th:text="${app.placementDrive.company.name}">Zoho</td>
+                                <td th:text="${app.placementDrive.jobRole}">Software Developer</td>
+                                <td class="fw-bold text-success" th:text="${'₹ ' + app.placementDrive.company.packageOffered + ' LPA'}">12 LPA</td>
+                                <td th:text="${app.appliedDate}">2026-08-20</td>
+                                <td>
+                                    <span th:class="${
+                                        app.status == 'SELECTED' ? 'badge bg-success fs-6' :
+                                        app.status == 'SHORTLISTED' ? 'badge bg-info text-dark fs-6' :
+                                        app.status == 'INTERVIEW' ? 'badge bg-warning text-dark fs-6' :
+                                        app.status == 'REJECTED' ? 'badge bg-danger fs-6' : 'badge bg-secondary fs-6'
+                                    }" th:text="${app.status}">APPLIED</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(applications)}">
+                                <td colspan="5" class="text-center py-4 text-muted">You have not submitted any placement applications yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

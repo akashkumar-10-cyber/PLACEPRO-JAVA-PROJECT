@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Placepro - Reports & Analytics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+    <style>
+        body {
+            position: relative;
+            background-color: #0b1329;
+            color: #ffffff;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('/images/reports-bg.png') no-repeat center center;
+            background-size: cover;
+            z-index: -1;
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        .main-content {
+            background: transparent !important;
+        }
+        .glass-card-header {
+            background: rgba(15, 23, 42, 0.88) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .dark-report-card {
+            background: rgba(15, 23, 42, 0.94) !important;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+            color: #ffffff !important;
+        }
+        .report-table {
+            background: transparent !important;
+            color: #ffffff !important;
+        }
+        .report-table th {
+            background: rgba(30, 41, 59, 0.9) !important;
+            color: #f59e0b !important;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+            padding: 1rem 1.25rem !important;
+        }
+        .report-table td {
+            background: rgba(15, 23, 42, 0.7) !important;
+            color: #ffffff !important;
+            padding: 1.1rem 1.25rem !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            vertical-align: middle !important;
+        }
+        .report-row-link {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .report-row-link:hover td {
+            background: rgba(245, 158, 11, 0.18) !important;
+            color: #f59e0b !important;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <main class="main-content">
+            <!-- PAGE HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4 glass-card-header animate-fade-in-up delay-header">
+                <div>
+                    <h2 class="fw-bold text-white mb-1"><i class="bi bi-bar-chart-line-fill text-warning me-2"></i>Placement Reports & Analytics</h2>
+                    <p class="text-white opacity-75 mb-0">Interactive placement statistics and officer analytical records.</p>
+                </div>
+            </div>
+
+            <!-- OVERVIEW METRICS TABLE WITH INTERACTIVE CLICKABLE ROWS -->
+            <div class="row g-4 mb-4 animate-fade-in-up delay-1">
+                <!-- SUMMARY STATISTICS CARD -->
+                <div class="col-md-6">
+                    <div class="card dark-report-card border-0 shadow-lg h-100 overflow-hidden">
+                        <div class="card-header bg-transparent fw-bold py-3 border-secondary text-white">
+                            <span class="fs-5"><i class="bi bi-pie-chart-fill text-warning me-2"></i>Summary Statistics</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table report-table align-middle mb-0">
+                                <tbody>
+                                    <tr class="report-row-link" onclick="window.location.href='/admin/students'">
+                                        <td>
+                                            <i class="bi bi-people-fill text-info me-2 fs-5"></i>
+                                            <span class="fw-semibold text-white fs-6">Total Registered Students</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-primary fs-6 px-3 py-2" th:text="${totalStudents}">0</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="report-row-link" onclick="window.location.href='/admin/companies'">
+                                        <td>
+                                            <i class="bi bi-building text-warning me-2 fs-5"></i>
+                                            <span class="fw-semibold text-white fs-6">Participating Companies</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-warning text-dark fs-6 px-3 py-2" th:text="${totalCompanies}">0</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="report-row-link" onclick="window.location.href='/admin/placement-drives'">
+                                        <td>
+                                            <i class="bi bi-calendar-event text-danger me-2 fs-5"></i>
+                                            <span class="fw-semibold text-white fs-6">Active Placement Drives</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-danger fs-6 px-3 py-2" th:text="${activeDrives}">0</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="report-row-link" onclick="window.location.href='/admin/applications'">
+                                        <td>
+                                            <i class="bi bi-file-earmark-text text-secondary me-2 fs-5"></i>
+                                            <span class="fw-semibold text-white fs-6">Total Applications Submitted</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-secondary fs-6 px-3 py-2" th:text="${totalApplications}">0</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="report-row-link" onclick="window.location.href='/admin/applications?status=SELECTED'">
+                                        <td>
+                                            <i class="bi bi-trophy-fill text-success me-2 fs-5"></i>
+                                            <span class="fw-semibold text-white fs-6">Students Selected / Placed</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-success fs-6 px-3 py-2" th:text="${selectedStudents}">0</span>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <i class="bi bi-graph-up-arrow text-success me-2 fs-5"></i>
+                                            <span class="fw-bold text-white fs-6">Overall Placement Percentage</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="badge bg-success bg-opacity-25 text-success border border-success fs-5 px-3 py-2" th:text="${placementPercentage + '%'}">0%</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEPARTMENT BREAKDOWN CARD -->
+                <div class="col-md-6">
+                    <div class="card dark-report-card border-0 shadow-lg h-100 overflow-hidden">
+                        <div class="card-header bg-transparent fw-bold py-3 border-secondary text-white">
+                            <span class="fs-5"><i class="bi bi-diagram-2-fill text-info me-2"></i>Department Breakdown</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table report-table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-4">Department Name</th>
+                                        <th class="text-end pe-4">Registered Students</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="entry : ${departmentWiseStudents}"
+                                        class="report-row-link"
+                                        th:data-dept="${entry.key}"
+                                        onclick="window.location.href='/admin/students?dept=' + encodeURIComponent(this.getAttribute('data-dept'))">
+                                        <td class="ps-4">
+                                            <i class="bi bi-mortarboard-fill text-info me-2 fs-5"></i>
+                                            <span class="fw-bold text-white fs-6" th:text="${entry.key}">Computer Science</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <span class="badge bg-info text-dark fs-6 px-3 py-1" th:text="${entry.value}">0</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

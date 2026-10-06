@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Placepro - Admin AI Recommendation Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+    <style>
+        body {
+            position: relative;
+            background-color: #080c18;
+            color: #ffffff;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('/images/ai-bg.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: -1;
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        .main-content {
+            background: rgba(8, 12, 24, 0.25) !important;
+        }
+        .glass-card-header {
+            background: rgba(15, 23, 42, 0.82) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 18px;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-radius: 18px !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+            color: #ffffff !important;
+        }
+        .glass-card h4, .glass-card h5, .glass-card label, .glass-card span {
+            color: #ffffff !important;
+        }
+        .ai-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <main class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4 glass-card-header animate-fade-in-up">
+                <div>
+                    <h2 class="fw-bold text-white mb-1"><i class="bi bi-cpu-fill text-warning me-2"></i>AI Placement Recommendation Portal</h2>
+                    <p class="text-white opacity-75 mb-0">Run Gemini AI company matching, skill gap analysis, and placement readiness assessment for any student.</p>
+                </div>
+            </div>
+
+            <!-- SEARCHABLE STUDENT SELECTION BAR -->
+            <div class="card glass-card border-0 shadow-lg rounded-4 mb-4 animate-fade-in-up delay-1">
+                <div class="card-body p-4">
+                    <form th:action="@{/admin/ai-recommendations}" method="get" id="aiAnalysisForm" class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-light"><i class="bi bi-search text-warning me-1"></i> Type Student Name or Registration Number</label>
+                            
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-dark text-warning border-secondary"><i class="bi bi-person-bounding-box"></i></span>
+                                <input type="text" id="studentSearchInput" class="form-control bg-dark text-white border-secondary fs-6"
+                                       placeholder="Type student name or reg no (e.g. Aarav, 2024CSE001, Priya)..."
+                                       list="studentsDatalist" autocomplete="off"
+                                       th:value="${selectedStudent != null ? (selectedStudent.registrationNumber + ' - ' + selectedStudent.name + ' (' + selectedStudent.department + ')') : ''}" required>
+                            </div>
+
+                            <input type="hidden" name="studentId" id="studentIdHidden" th:value="${selectedStudent != null ? selectedStudent.id : ''}">
+
+                            <datalist id="studentsDatalist">
+                                <option th:each="s : ${students}"
+                                        th:value="${s.registrationNumber + ' - ' + s.name + ' (' + s.department + ')'}"
+                                        th:data-id="${s.id}">
+                                </option>
+                            </datalist>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold shadow-sm text-dark border-0">
+                                <i class="bi bi-stars me-1"></i> Run AI Analysis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ANALYSIS RESULTS -->
+            <div th:if="${selectedStudent != null}" class="animate-fade-in-up delay-2">
+                <div class="alert bg-primary bg-opacity-20 border-primary text-white rounded-4 border-0 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-white" th:text="${'Analysis for ' + selectedStudent.name}">Student Name</h5>
+                            <span class="badge bg-primary fs-6 me-1" th:text="${selectedStudent.department}">Dept</span>
+                            <span class="badge bg-success fs-6 me-1" th:text="${'CGPA: ' + selectedStudent.cgpa}">9.0</span>
+                            <span class="badge bg-info text-dark fs-6" th:text="${'Reg: ' + selectedStudent.registrationNumber}">2024CSE001</span>
+                        </div>
+                        <div>
+                            <span class="ai-badge shadow-sm"><i class="bi bi-robot me-1"></i> Gemini AI Engine</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- READINESS CARD -->
+                    <div class="col-md-5">
+                        <div class="card glass-card p-4 h-100">
+                            <h5 class="fw-bold text-white mb-3"><i class="bi bi-speedometer2 text-warning me-2"></i>Placement Readiness</h5>
+                            
+                            <div class="text-center py-3">
+                                <div class="display-3 fw-bold text-warning mb-1" th:text="${readiness['overallScore'] + '%'}">85%</div>
+                                <span class="badge bg-success fs-6 px-3 py-2" th:text="${readiness['readinessLevel']}">HIGH</span>
+                            </div>
+
+                            <p class="text-light opacity-90 mt-3 mb-0" th:text="${readiness['explanation']}">Readiness breakdown...</p>
+                        </div>
+                    </div>
+
+                    <!-- TOP RECOMMENDATION CARD -->
+                    <div class="col-md-7">
+                        <div class="card glass-card p-4 h-100">
+                            <h5 class="fw-bold text-white mb-3"><i class="bi bi-building-check text-info me-2"></i>Top Recommended Company Match</h5>
+
+                            <div th:if="${not #lists.isEmpty(recommendations)}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 class="fw-bold text-warning mb-0" th:text="${recommendations[0].companyName}">Company</h4>
+                                    <span class="badge bg-success fs-5" th:text="${recommendations[0].matchScore + '% Match'}">95% Match</span>
+                                </div>
+                                <p class="text-white mb-2"><i class="bi bi-geo-alt me-1 text-danger"></i> <span th:text="${recommendations[0].location}">Location</span> | <i class="bi bi-cash-stack me-1 text-success"></i> <span th:text="${recommendations[0].packageOffered}">10 LPA</span></p>
+                                <p class="text-light opacity-90 bg-dark p-3 rounded-3" th:text="${recommendations[0].recommendationReason}">Reason...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALL MATCHES TABLE -->
+                <div class="card glass-card p-4">
+                    <h5 class="fw-bold text-white mb-3"><i class="bi bi-list-stars text-warning me-2"></i>All Eligible Company Recommendations</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="text-warning">
+                                    <th>Company</th>
+                                    <th>Industry</th>
+                                    <th>Package</th>
+                                    <th>Match Score</th>
+                                    <th>Matched Skills</th>
+                                    <th>Missing Skills</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="r : ${recommendations}">
+                                    <td class="fw-bold text-white" th:text="${r.companyName}">Company</td>
+                                    <td th:text="${r.industry}">Industry</td>
+                                    <td class="text-success fw-semibold" th:text="${r.packageOffered}">10 LPA</td>
+                                    <td>
+                                        <span class="badge bg-success fs-6" th:text="${r.matchScore + '%'}">90%</span>
+                                    </td>
+                                    <td>
+                                        <span th:each="ms : ${r.matchedSkills}" class="badge bg-primary me-1" th:text="${ms}">Skill</span>
+                                    </td>
+                                    <td>
+                                        <span th:each="m : ${r.missingSkills}" class="badge bg-danger me-1" th:text="${m}">Skill</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const studentSearchInput = document.getElementById('studentSearchInput');
+        const studentIdHidden = document.getElementById('studentIdHidden');
+        const datalist = document.getElementById('studentsDatalist');
+
+        studentSearchInput.addEventListener('input', function() {
+            const val = this.value.trim().toLowerCase();
+            let matchedId = '';
+            for (let option of datalist.options) {
+                if (option.value.toLowerCase() === val || option.value.toLowerCase().includes(val)) {
+                    matchedId = option.getAttribute('data-id');
+                    if (option.value.toLowerCase() === val) {
+                        break;
+                    }
+                }
+            }
+            studentIdHidden.value = matchedId;
+        });
+
+        document.getElementById('aiAnalysisForm').addEventListener('submit', function(e) {
+            if (!studentIdHidden.value) {
+                const val = studentSearchInput.value.trim().toLowerCase();
+                for (let option of datalist.options) {
+                    if (option.value.toLowerCase().includes(val)) {
+                        studentIdHidden.value = option.getAttribute('data-id');
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Placepro - Placement Applications Tracking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/custom.css}" rel="stylesheet">
+    <style>
+        body {
+            position: relative;
+            background-color: #0b1329;
+            color: #ffffff;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('/images/applications-bg.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: -1;
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        .main-content {
+            background: transparent !important;
+        }
+        .glass-header {
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .glass-modal {
+            background: #0f172a !important;
+            border: 3px solid #f59e0b !important;
+            border-radius: 24px !important;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(245, 158, 11, 0.4) !important;
+            color: #ffffff !important;
+        }
+        .modal-dialog {
+            max-width: 580px !important;
+        }
+        .search-input-pill {
+            font-size: 1.05rem !important;
+            padding: 0.85rem 1.4rem !important;
+            border-radius: 50px !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #f59e0b !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        .search-input-pill:focus {
+            border-color: #d97706 !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5) !important;
+        }
+        .status-select-pill {
+            font-size: 1.05rem !important;
+            padding: 0.85rem 1.4rem !important;
+            border-radius: 50px !important;
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            border: 2px solid #f59e0b !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        .status-select-pill:focus {
+            border-color: #d97706 !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.5) !important;
+        }
+        input::-webkit-search-decoration,
+        input::-webkit-search-cancel-button,
+        input::-webkit-search-results-button,
+        input::-webkit-search-results-decoration {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="app-container">
+        <main class="main-content">
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-center mb-4 glass-header animate-fade-in-up delay-header">
+                <div>
+                    <h2 class="fw-bold text-white mb-1"><i class="bi bi-file-earmark-check-fill text-warning me-2"></i>Student Placement Applications</h2>
+                    <p class="text-white opacity-75 mb-0">Track application status and filter students by Placed, Rejected, Shortlisted, or Interview status.</p>
+                </div>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}">Success</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- SEARCH & DEDICATED STATUS FILTER BAR -->
+            <div class="card border-0 shadow-lg rounded-4 mb-4 animate-fade-in-up delay-1">
+                <div class="card-body p-4">
+                    <form th:action="@{/admin/applications}" method="get" id="filterForm" class="row g-3" onsubmit="return false;">
+                        <!-- SEARCH INPUT (NAME, REG NO, DEPT) -->
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-dark mb-1 fs-6"><i class="bi bi-search text-warning me-2"></i>Search Student Records</label>
+                            <input type="text" id="appSearchInput" class="form-control search-input-pill fw-semibold"
+                                   placeholder="Type student name, register number or department (e.g. Divya, 2024CSE017, CSE)..."
+                                   list="appSearchDatalist" autocomplete="off" th:value="${query}">
+
+                            <!-- AUTO-COMPLETE DATALIST -->
+                            <datalist id="appSearchDatalist">
+                                <option th:each="app : ${applications}" th:value="${app.student.name}"></option>
+                                <option th:each="app : ${applications}" th:value="${app.student.registrationNumber}"></option>
+                                <option th:each="app : ${applications}" th:value="${app.student.department}"></option>
+                                <option th:each="app : ${applications}" th:value="${app.student.name} + ' (' + ${app.student.registrationNumber} + ' - ' + ${app.student.department} + ')'"></option>
+                            </datalist>
+                        </div>
+
+                        <!-- DEDICATED STATUS FILTER DROPDOWN BOX -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-dark mb-1 fs-6"><i class="bi bi-funnel-fill text-warning me-2"></i>Status</label>
+                            <select name="status" id="statusSelect" class="form-select status-select-pill fw-bold text-dark" onchange="applyCombinedFilters()">
+                                <option value="">-- All Statuses --</option>
+                                <option value="PLACED" th:selected="${selectedStatus == 'PLACED' || selectedStatus == 'SELECTED'}">🏆 PLACED</option>
+                                <option value="SHORTLISTED" th:selected="${selectedStatus == 'SHORTLISTED'}">⭐ SHORTLISTED</option>
+                                <option value="INTERVIEW" th:selected="${selectedStatus == 'INTERVIEW'}">🗣️ INTERVIEW</option>
+                                <option value="APPLIED" th:selected="${selectedStatus == 'APPLIED'}">📝 APPLIED</option>
+                                <option value="REJECTED" th:selected="${selectedStatus == 'REJECTED'}">❌ REJECTED</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- APPLICATIONS TABLE -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden animate-fade-in-up delay-2">
+                <div class="table-responsive">
+                    <table class="table table-hover table-custom align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Reg No</th>
+                                <th>Department</th>
+                                <th>Company</th>
+                                <th>Job Role</th>
+                                <th>Applied Date</th>
+                                <th>Status</th>
+                                <th class="text-center">Action / Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTableBody">
+                            <tr th:each="app : ${applications}"
+                                th:data-student-name="${#strings.toLowerCase(app.student.name)}"
+                                th:data-student-reg="${#strings.toLowerCase(app.student.registrationNumber)}"
+                                th:data-student-dept="${#strings.toUpperCase(app.student.department)}"
+                                th:data-company-name="${#strings.toLowerCase(app.placementDrive.company.name)}"
+                                th:data-status="${#strings.toUpperCase(app.status)}">
+                                <td class="fw-bold text-dark" th:text="${app.student.name}">Student Name</td>
+                                <td class="text-primary font-monospace fw-bold" th:text="${app.student.registrationNumber}">REG001</td>
+                                <td><span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold" th:text="${app.student.department}">CSE</span></td>
+                                <td class="fw-semibold text-dark" th:text="${app.placementDrive.company.name}">Company</td>
+                                <td th:text="${app.placementDrive.jobRole}">Role</td>
+                                <td th:text="${#temporals.format(app.appliedDate, 'dd-MMM-yyyy')}">01-Jan-2025</td>
+                                <td>
+                                    <span th:if="${app.status == 'APPLIED'}" class="badge bg-info text-dark">APPLIED</span>
+                                    <span th:if="${app.status == 'SHORTLISTED'}" class="badge bg-warning text-dark">SHORTLISTED</span>
+                                    <span th:if="${app.status == 'INTERVIEW'}" class="badge bg-primary">INTERVIEW</span>
+                                    <span th:if="${app.status == 'PLACED' or app.status == 'SELECTED'}" class="badge bg-success fs-6"><i class="bi bi-trophy-fill me-1"></i>PLACED</span>
+                                    <span th:if="${app.status == 'REJECTED'}" class="badge bg-danger">REJECTED</span>
+                                </td>
+                                <td class="text-center">
+                                    <!-- VIEW DETAILS BUTTON -->
+                                    <button type="button" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1"
+                                            th:data-name="${app.student.name}"
+                                            th:data-reg="${app.student.registrationNumber}"
+                                            th:data-dept="${app.student.department}"
+                                            th:data-cgpa="${app.student.cgpa}"
+                                            th:data-company="${app.placementDrive.company.name}"
+                                            th:data-role="${app.placementDrive.jobRole}"
+                                            th:data-package="${app.placementDrive.company.packageOffered}"
+                                            th:data-location="${app.placementDrive.company.location}"
+                                            th:data-status="${app.status}"
+                                            th:data-date="${#temporals.format(app.appliedDate, 'dd-MMM-yyyy')}"
+                                            onclick="openDetailsModal(this)"
+                                            title="View Placement & Application Details">
+                                        <i class="bi bi-eye-fill"></i> View Details
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(applications)}">
+                                <td colspan="8" class="text-center py-4 text-muted">No applications found matching your status/search selection.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ROOT LEVEL GLOBAL PLACEMENT DETAILS MODAL -->
+    <div class="modal fade" id="globalAppModal" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-modal text-white p-2">
+                
+                <!-- MODAL HEADER -->
+                <div class="modal-header border-secondary pb-2 justify-content-center">
+                    <h5 class="modal-title fw-bold text-warning mb-0 fs-5">
+                        <i class="bi bi-award-fill text-warning me-1"></i> Placement Details
+                    </h5>
+                </div>
+
+                <!-- MODAL BODY -->
+                <div class="modal-body p-3 text-start">
+                    <!-- STUDENT PROFILE -->
+                    <div class="text-center mb-3 pb-2 border-bottom border-secondary">
+                        <div class="fs-3 fw-bold text-white mb-2" id="modalStudentName">Student Name</div>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <span class="badge bg-primary fs-6 px-3 py-1" id="modalStudentDept">CSE</span>
+                            <span class="badge bg-warning text-dark fs-6 px-3 py-1 fw-bold" id="modalStudentReg">Reg No: 2024CSE001</span>
+                            <span class="badge bg-success fs-6 px-3 py-1 fw-bold" id="modalStudentCgpa">CGPA: 8.5</span>
+                        </div>
+                    </div>
+
+                    <!-- COMPANY & OFFER DETAILS -->
+                    <div class="card bg-white text-dark p-3 rounded-4 shadow-lg mb-3 border-2 border-warning">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.75rem;"><i class="bi bi-building text-warning me-1"></i> Company Name</div>
+                                <div class="fw-extrabold text-primary fs-5" id="modalCompanyName">Google Cloud India</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.75rem;"><i class="bi bi-briefcase text-info me-1"></i> Job Role Offered</div>
+                                <div class="fw-bold text-dark fs-6" id="modalJobRole">Software Engineer</div>
+                            </div>
+                            <div class="col-6 mt-2">
+                                <div class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.75rem;"><i class="bi bi-cash-stack text-success me-1"></i> Package Offered</div>
+                                <div class="fw-extrabold text-success fs-4" id="modalPackage">18.0 - 24.0 LPA</div>
+                            </div>
+                            <div class="col-6 mt-2">
+                                <div class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.75rem;"><i class="bi bi-geo-alt text-danger me-1"></i> Job Location</div>
+                                <div class="fw-bold text-primary fs-6" id="modalLocation">Bengaluru</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STATUS & APPLIED DATE CARD -->
+                    <div class="card bg-white text-dark p-3 rounded-4 border-2 border-info shadow-sm d-flex flex-row justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.75rem;"><i class="bi bi-info-circle-fill text-primary me-1"></i> Current Status</div>
+                            <span id="modalStatusBadge" class="badge bg-success fs-5 px-3 py-1 shadow-sm"><i class="bi bi-trophy-fill me-1"></i> PLACED</span>
+                        </div>
+                        <div class="text-end">
+                            <div class="fw-bold text-uppercase text-secondary mb-1" style="font-size: 0.75rem;"><i class="bi bi-calendar-check-fill text-warning me-1"></i> Applied Date</div>
+                            <div class="fw-extrabold text-dark fs-5" id="modalAppliedDate">23-Aug-2026</div>
+                        </div>
+                    </div>
+
+                    <!-- SINGLE CLEAN BACK BUTTON AT BOTTOM -->
+                    <div class="d-grid pt-1">
+                        <button type="button" class="btn btn-warning text-dark fw-bold rounded-pill py-2 shadow fs-6" data-bs-dismiss="modal">
+                            <i class="bi bi-arrow-left-circle-fill me-1"></i> Back to Applications
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const appSearchInput = document.getElementById('appSearchInput');
+        const statusSelect = document.getElementById('statusSelect');
+
+        function applyCombinedFilters() {
+            const rawSearch = appSearchInput.value.toLowerCase().trim();
+            let searchVal = rawSearch;
+            if (rawSearch.includes('(')) {
+                searchVal = rawSearch.split('(')[0].trim();
+            }
+
+            const statusVal = statusSelect.value.toUpperCase();
+
+            const rows = document.querySelectorAll('#applicationsTableBody tr');
+            rows.forEach(row => {
+                const sName = (row.getAttribute('data-student-name') || '').toLowerCase();
+                const sReg = (row.getAttribute('data-student-reg') || '').toLowerCase();
+                const sDept = (row.getAttribute('data-student-dept') || '').toLowerCase();
+                const cName = (row.getAttribute('data-company-name') || '').toLowerCase();
+                const sStatus = (row.getAttribute('data-status') || '').toUpperCase();
+                const text = row.textContent.toLowerCase();
+
+                let matchesSearch = !searchVal || sName.includes(searchVal) || sReg.includes(searchVal) || sDept.includes(searchVal) || cName.includes(searchVal) || text.includes(searchVal);
+                let matchesStatus = !statusVal || sStatus === statusVal || (statusVal === 'PLACED' && (sStatus === 'PLACED' || sStatus === 'SELECTED'));
+
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        appSearchInput.addEventListener('input', applyCombinedFilters);
+        appSearchInput.addEventListener('change', applyCombinedFilters);
+        statusSelect.addEventListener('change', applyCombinedFilters);
+
+        function openDetailsModal(btn) {
+            document.getElementById('modalStudentName').textContent = btn.getAttribute('data-name');
+            document.getElementById('modalStudentDept').textContent = btn.getAttribute('data-dept');
+            document.getElementById('modalStudentReg').textContent = 'Reg No: ' + btn.getAttribute('data-reg');
+            document.getElementById('modalStudentCgpa').textContent = 'CGPA: ' + btn.getAttribute('data-cgpa');
+            document.getElementById('modalCompanyName').textContent = btn.getAttribute('data-company');
+            document.getElementById('modalJobRole').textContent = btn.getAttribute('data-role');
+            document.getElementById('modalPackage').textContent = btn.getAttribute('data-package');
+            document.getElementById('modalLocation').textContent = btn.getAttribute('data-location');
+            document.getElementById('modalAppliedDate').textContent = btn.getAttribute('data-date');
+
+            const st = btn.getAttribute('data-status');
+            const badgeEl = document.getElementById('modalStatusBadge');
+            if (st === 'PLACED' || st === 'SELECTED') {
+                badgeEl.className = 'badge bg-success fs-5 px-3 py-1 shadow-sm';
+                badgeEl.innerHTML = '<i class="bi bi-trophy-fill me-1"></i> PLACED';
+            } else if (st === 'SHORTLISTED') {
+                badgeEl.className = 'badge bg-warning text-dark fs-6 px-3 py-1';
+                badgeEl.innerHTML = 'SHORTLISTED';
+            } else if (st === 'INTERVIEW') {
+                badgeEl.className = 'badge bg-primary fs-6 px-3 py-1';
+                badgeEl.innerHTML = 'INTERVIEW';
+            } else if (st === 'REJECTED') {
+                badgeEl.className = 'badge bg-danger fs-6 px-3 py-1';
+                badgeEl.innerHTML = 'REJECTED';
+            } else {
+                badgeEl.className = 'badge bg-info text-dark fs-6 px-3 py-1';
+                badgeEl.innerHTML = 'APPLIED';
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('globalAppModal'));
+            modal.show();
+        }
+
+        window.addEventListener('DOMContentLoaded', applyCombinedFilters);
+    </script>
+</body>
+</html>
